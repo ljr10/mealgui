@@ -1,15 +1,16 @@
 import requests
-import json
-from datetime import datetime
 import tkinter as tk
 from tkinter import Text, Scrollbar, Entry
 
-def get_meal(sc, msc, date):
+with open('api.txt', 'r') as file:
+    api = file.readline()
+
+def get_meal(sc ,msc ,date):
     url = "https://open.neis.go.kr/hub/mealServiceDietInfo"
     headers = { "Content-type": "application/json" }
 
     payload_today = {
-        "KEY": "your api key",
+        "KEY": api,
         "Type": "json",
         "pIndex": 1,
         "pSize": 1,
@@ -23,7 +24,7 @@ def get_meal(sc, msc, date):
 
     try:
         meal_data_today = data_today["mealServiceDietInfo"][1]["row"][0]["DDISH_NM"]
-        cleaned_info_today = "<br>".join(''.join(c for c in line if c not in '()0123456789.').strip() for line in meal_data_today.split("<br/>"))
+        cleaned_info_today = "\n".join(''.join(c for c in line if c not in '()0123456789.').strip() for line in meal_data_today.split("<br/>"))
     except KeyError:
         cleaned_info_today = "급식 정보를 불러올 수 없습니다. 이는 오늘 급식이 없거나 서버의 문제일수도 있습니다."
 
@@ -40,15 +41,13 @@ def on_date_enter(event):
 
 def show_meal_info():
     selected_date = date_entry.get()
-    meal_info = get_meal_info(school_code_entry.get(), middle_school_code_entry.get(), selected_date)
+    meal_info = get_meal(school_code_entry.get(), middle_school_code_entry.get(), selected_date)
     result_text.delete(1.0, tk.END)
     result_text.insert(tk.END, meal_info)
 
-# Create the main Tkinter window
 root = tk.Tk()
 root.title("급식 정보")
 
-# Create and place widgets in the window
 school_code_label = tk.Label(root, text="학교 코드:")
 school_code_label.pack()
 
